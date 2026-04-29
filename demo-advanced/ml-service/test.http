@@ -1,0 +1,38 @@
+### Healthcheck
+GET http://localhost:8000/health
+
+### Root
+GET http://localhost:8000/
+
+### Customer by email - Daniel
+GET http://localhost:8000/customer/by-email?email=daniel.hoyosg@upb.edu.co
+
+### Customer by email - Ana
+GET http://localhost:8000/customer/by-email?email=ana.premium@demo.com
+
+### Customer by id
+GET http://localhost:8000/customer/1042
+
+### Payments
+GET http://localhost:8000/payments/2017
+
+### Predict churn
+POST http://localhost:8000/predict_churn
+Content-Type: application/json
+
+{ "customer_id": 5001 }
+
+### MCP tools descriptor
+GET http://localhost:8000/mcp/tools
+
+### MCP invoke - get_customer_features
+POST http://localhost:8000/mcp/invoke
+Content-Type: application/json
+
+{ "tool": "get_customer_features", "arguments": { "email": "daniel.hoyosg@upb.edu.co" } }
+
+### MCP invoke - predict_churn
+POST http://localhost:8000/mcp/invoke
+Content-Type: application/json
+
+{ "tool": "predict_churn", "arguments": { "customer_id": 5001 } }

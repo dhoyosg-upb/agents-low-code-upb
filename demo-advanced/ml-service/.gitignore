@@ -1,0 +1,10 @@
+# Ignorar artefactos generados al entrenar (HF los regenera en el build)
+__pycache__/
+*.pyc
+.venv/
+.env
+.DS_Store
+
+# Si quieres versionar el modelo, comenta estas dos lineas
+churn_model.pkl
+training_report.json

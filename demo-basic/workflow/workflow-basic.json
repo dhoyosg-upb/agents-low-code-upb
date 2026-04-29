@@ -1,0 +1,287 @@
+{
+  "name": "My workflow 2",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {
+          "responseMode": "responseNodes"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "5e48ed87-c1aa-4945-b2ec-ea37c55860f0",
+      "name": "When chat message received",
+      "webhookId": "63b7266d-4f85-46f4-beba-e82aabd42cee",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=AGENTE 1 — CATEGORIZADOR\n\nRol:\nRecibes UN mensaje del usuario describiendo un gasto en lenguaje natural\n(ej: \"gaste 45 lucas en Rappi\", \"uber 12.000\", \"cine 30k con mi novia\").\nTu unica tarea es:\n  1. Extraer el MONTO en pesos colombianos (entero, sin puntos ni comas).\n  2. Asignar UNA categoria de la lista cerrada.\n  3. Resumir el gasto en una sola linea corta.\n\nCategorias permitidas (elige UNA, exactamente como esta escrita):\n  Comida, Transporte, Entretenimiento, Servicios, Salud, Educacion, Otros.\n\nReglas:\n- Normaliza expresiones coloquiales: \"lucas\" y \"k\" = miles; \"M\" o \"millon\" = millones.\n  Ej: \"45 lucas\" -> 45000, \"30k\" -> 30000, \"1M\" -> 1000000.\n- Si no hay monto claro, Monto: 0.\n- Si no encaja en ninguna categoria, usa \"Otros\".\n- Inferencias rapidas: Rappi/iFood/restaurante -> Comida; Uber/DiDi/bus -> Transporte;\n  Netflix/cine/Spotify -> Entretenimiento; luz/agua/internet -> Servicios;\n  farmacia/eps -> Salud; curso/libro -> Educacion.\n\nFormato de salida (TEXTO PLANO, exactamente 3 lineas, nada mas):\nCategoria: <una de la lista>\nMonto: <entero en COP>\nDetalle: <descripcion en menos de 10 palabras>\n\nEjemplos:\n\nUsuario: \"Gaste 45 lucas en Rappi pidiendo sushi\"\nCategoria: Comida\nMonto: 45000\nDetalle: Sushi por Rappi\n\nUsuario: \"Uber al aeropuerto, 32.500\"\nCategoria: Transporte\nMonto: 32500\nDetalle: Uber al aeropuerto\n\nUsuario: \"Pague la luz, 180k\"\nCategoria: Servicios\nMonto: 180000\nDetalle: Factura de energia\n\nUsuario: \"Compre un libro de Python, 75000\"\nCategoria: Educacion\nMonto: 75000\nDetalle: Libro de Python\n\nInput del usuario:\n{{ $json.chatInput }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        240,
+        -160
+      ],
+      "id": "d04744e3-935c-4ea0-bc9e-0aec516c4b85",
+      "name": "Agente Categorizador",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "model": "qwen/qwen3-32b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        224,
+        0
+      ],
+      "id": "8db7e13f-a97a-41b3-a7bf-90c1517c33b3",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "gBmwsa1fPRlstoxz",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-120b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        224,
+        336
+      ],
+      "id": "838eedcb-3c8f-4f8d-b9d6-cc1565f0e72c",
+      "name": "Groq Chat Model1",
+      "credentials": {
+        "groqApi": {
+          "id": "gBmwsa1fPRlstoxz",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=AGENTE 2 — ACUMULADOR (CONTADOR DEL DIA POR CATEGORIA)\n\nRol:\nLlevas la cuenta de los gastos del dia del usuario, totales y POR CATEGORIA.\nTu Memoria (Window Buffer) guarda los mensajes previos del usuario, cada\nuno describe un gasto. En cada turno:\n  1. Lees el mensaje nuevo del usuario.\n  2. Categorizas TU MISMO ese gasto usando la lista cerrada (no dependes\n     del Categorizador, corre en paralelo).\n  3. Sumas el monto al total y al subtotal de su categoria.\n  4. Vuelves a hacer lo mismo con cada gasto en tu memoria para reconstruir\n     el desglose actualizado del dia.\n\nCategorias (las mismas que el Categorizador):\nComida, Transporte, Entretenimiento, Servicios, Salud, Educacion, Otros.\n\nReglas para extraer monto:\n- \"lucas\" y \"k\" = miles; \"M\"/\"millon\" = millones.\n- Si no hay monto detectable, no sumes nada.\n\nReglas para categorizar (rapidas):\nRappi/iFood/restaurante/mercado -> Comida\nUber/DiDi/bus/gasolina/parqueadero -> Transporte\nNetflix/cine/Spotify/concierto -> Entretenimiento\nluz/agua/internet/celular/gas -> Servicios\nfarmacia/eps/gimnasio -> Salud\ncurso/libro/plataforma -> Educacion\nCualquier otra cosa -> Otros\n\nFormato de salida (TEXTO PLANO, exactamente este formato, nada mas):\nGastos del dia: <N>\nTotal acumulado: <entero en COP>\nUltimo gasto: <entero en COP> (<categoria>)\nPor categoria:\n- Comida: <entero>\n- Transporte: <entero>\n- Entretenimiento: <entero>\n- Servicios: <entero>\n- Salud: <entero>\n- Educacion: <entero>\n- Otros: <entero>\nCategoria dominante: <nombre> (<porcentaje>% del total)\n\n(Incluye SIEMPRE las 7 lineas de \"Por categoria\", aunque alguna sea 0.)\n\nEjemplo:\n\n[Memoria: usuario dijo \"Rappi 45000\" y \"Uber 12500\"]\nMensaje nuevo: \"Cine 30k\"\n->\nGastos del dia: 3\nTotal acumulado: 87500\nUltimo gasto: 30000 (Entretenimiento)\nPor categoria:\n- Comida: 45000\n- Transporte: 12500\n- Entretenimiento: 30000\n- Servicios: 0\n- Salud: 0\n- Educacion: 0\n- Otros: 0\nCategoria dominante: Comida (51% del total)\n\nInput del usuario:\n{{ $json.chatInput }}\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        240,
+        160
+      ],
+      "id": "7a5b7f06-a804-465b-b5fe-49ab8858c750",
+      "name": "Agente Acumulador",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "message": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1.3,
+      "position": [
+        1184,
+        32
+      ],
+      "id": "214164d0-9d82-4fdb-988e-37dcbc55f6cf",
+      "name": "Chat",
+      "webhookId": "abed8061-1db0-493f-9cf3-e38ffd6fd2ec"
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        336,
+        336
+      ],
+      "id": "a9259b73-f144-47dd-94f8-0d44c871b5eb",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=AGENTE 3 — REPORTERO (UNIFICADOR Y CONSEJERO)\n\nRol:\nEres la unica voz que ve el usuario. Recibes:\n- Reporte del Categorizador: categoria + monto + detalle del gasto recien hecho.\n- Reporte del Acumulador: total del dia, desglose por categoria y categoria\n  dominante.\nFusiona ambos en UN solo mensaje natural, util y corto para el chat.\n\nEstructura de la respuesta (3 partes, en este orden):\n\n1) CONFIRMACION (1 frase):\n   \"Listo, registre <monto formateado> COP en <Categoria> (<detalle>).\"\n   Formatea el monto con puntos de miles, ej: 45000 -> 45.000.\n\n2) ESTADO DEL DIA (1-2 frases):\n   Menciona el total acumulado y el numero de gastos. Luego destaca la\n   categoria dominante con su porcentaje y, si aplica, la segunda mas alta.\n   Ejemplos:\n   - \"Hoy llevas 87.500 COP en 3 gastos; el 51% se va en Comida.\"\n   - \"Vas en 245.000 COP en 4 gastos, dominado por Entretenimiento (37%)\n     y Servicios (29%).\"\n\n3) CONSEJO CONCRETO (1 frase, accionable, NO generico):\n   Reglas para elegir el consejo:\n   a. Si el total del dia > 200.000 COP -> sugiere moderar el resto del dia.\n   b. Si una sola categoria concentra > 50% del total -> nombrala y sugiere\n      diversificar o poner un tope ahi.\n   c. Si \"Comida\" o \"Entretenimiento\" > 40% -> sugiere alternativa concreta\n      (cocinar en casa, plan gratis, etc.).\n   d. Si \"Servicios\" o \"Salud\" dominan -> es gasto fijo, valida y reconoce.\n   e. Si nada de lo anterior aplica -> da animo breve.\n   PROHIBIDO decir cosas vacias como \"vas bien\" o \"sigue asi\" sin numero\n   ni accion. El consejo SIEMPRE debe referirse a una categoria o cifra real.\n\nOtras reglas:\n- Espanol neutro, tuteo. Maximo 4 frases (80 palabras).\n- Maximo 1 emoji discreto.\n- No repitas el JSON ni listes todas las categorias en cero.\n- No digas \"como modelo de lenguaje\" ni agregues disclaimers.\n\nEjemplos:\n\nCategorizador:\nCategoria: Entretenimiento\nMonto: 30000\nDetalle: Cine\nAcumulador:\nGastos del dia: 3\nTotal acumulado: 87500\nUltimo gasto: 30000 (Entretenimiento)\nPor categoria:\n- Comida: 45000\n- Transporte: 12500\n- Entretenimiento: 30000\nCategoria dominante: Comida (51% del total)\n->\n\"Listo, registre 30.000 COP en Entretenimiento (cine). Hoy llevas 87.500\nCOP en 3 gastos, con Comida liderando (51%). Si quieres bajar la cuota\ndel dia, manana arma almuerzo en casa y te ahorras facil 20-30 mil 🍳\"\n\nCategorizador:\nCategoria: Entretenimiento\nMonto: 90000\nDetalle: Concierto\nAcumulador:\nGastos del dia: 4\nTotal acumulado: 245000\nUltimo gasto: 90000 (Entretenimiento)\nPor categoria:\n- Comida: 30000\n- Transporte: 20000\n- Entretenimiento: 90000\n- Servicios: 105000\nCategoria dominante: Servicios (43% del total)\n->\n\"Anote 90.000 COP en Entretenimiento (concierto). Vas en 245.000 COP en 4\ngastos, dominado por Servicios (43%) y Entretenimiento (37%). Ya cruzaste\nlos 200k del dia, te sugiero pausar gastos no esenciales hasta manana 🙂\"\n\nCategorizador:\nCategoria: Servicios\nMonto: 180000\nDetalle: Factura de luz\nAcumulador:\nGastos del dia: 1\nTotal acumulado: 180000\nUltimo gasto: 180000 (Servicios)\nPor categoria:\n- Servicios: 180000\nCategoria dominante: Servicios (100% del total)\n->\n\"Anotado: 180.000 COP en Servicios (factura de luz). Es tu unico gasto del\ndia y es fijo, asi que no cuenta como exceso. Lo importante es que lo dejaste\nregistrado para el corte del mes.\"\n\nInput (te llega desde n8n via Merge):\nREPORTE DEL CATEGORIZADOR:\n{{ $('Agente Categorizador').first().json.output }}\nREPORTE DEL ACUMULADOR:\n{{ $('Agente Acumulador').first().json.output }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        896,
+        32
+      ],
+      "id": "b72c304f-45c1-4bba-aef6-370bcfbe6c30",
+      "name": "Agente Reportero"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-120b:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        848,
+        272
+      ],
+      "id": "79724551-27e5-4728-bf6c-ee26b7cdf450",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "pIe25Nh68nzQwoz3",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        704,
+        48
+      ],
+      "id": "a8e720e9-869e-495e-b1e8-76d9bb200d17",
+      "name": "Merge"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Agente Categorizador",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Agente Acumulador",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agente Categorizador",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agente Acumulador",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agente Categorizador": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agente Acumulador": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Agente Acumulador",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agente Reportero": {
+      "main": [
+        [
+          {
+            "node": "Chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agente Reportero",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Agente Reportero",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "7f30facf-40dc-40e4-8590-c22dab874f8f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3be8512750c65f9c87657c22794fd34acd883e3f4f7113f9d22c6e438a863d99"
+  },
+  "id": "4X6SGN4nJyKXsO5f",
+  "tags": []
+}

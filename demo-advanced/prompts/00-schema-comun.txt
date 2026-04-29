@@ -1,0 +1,82 @@
+================================================================
+ESQUEMAS JSON DE LOS AGENTES
+================================================================
+
+Hay DOS formas en este workflow:
+
+  1. CONCIERGE -> usa { ready, reply, data }
+     "ready" es boolean. Es el unico campo que controla el flujo.
+
+  2. RESTO DE AGENTES (Comercial, Riesgo, CX, Strategist) ->
+     usan { reply, data }
+     No necesitan controlar flujo, solo aportar resultado.
+
+================================================================
+SCHEMA DEL CONCIERGE (pegar en su Structured Output Parser)
+================================================================
+
+{
+  "type": "object",
+  "properties": {
+    "ready": { "type": "boolean" },
+    "reply": { "type": "string" },
+    "data": {
+      "type": "object",
+      "properties": {
+        "customer_id": { "type": ["integer", "null"] },
+        "email":       { "type": ["string", "null"] },
+        "name":        { "type": ["string", "null"] },
+        "message":     { "type": ["string", "null"] }
+      },
+      "required": ["customer_id", "email", "name", "message"]
+    }
+  },
+  "required": ["ready", "reply", "data"]
+}
+
+================================================================
+SCHEMA GENERICO (Comercial, Riesgo, CX, Strategist)
+================================================================
+
+{
+  "type": "object",
+  "properties": {
+    "reply": { "type": "string" },
+    "data":  { "type": "object" }
+  },
+  "required": ["reply", "data"]
+}
+
+NOTA: cada uno de esos agentes documenta en su propio TXT que keys
+van dentro de "data". Si quieres mas estricto, pega el schema
+completo del TXT correspondiente.
+
+================================================================
+COMO LO USA EL WORKFLOW EN n8n
+================================================================
+
+1) IF despues del Concierge:
+     Value 1:  ={{ $json.output.ready }}
+     Operator: Boolean -> is true
+     - TRUE  -> al pipeline de los 3 analistas + Strategist
+     - FALSE -> al Set node 3b (vuelve a hablar con el usuario)
+
+2) Set FINAL (despues del Strategist):
+     Name:  output
+     Value: ={{ $json.output.reply }}
+     Keep Only Set: ON
+
+3) Set rama FALSE (despues del IF):
+     Name:  output
+     Value: ={{ $json.output.reply }}
+     Keep Only Set: ON
+
+   AMBOS Set son IDENTICOS porque tanto el Concierge como el
+   Strategist guardan el texto al usuario en "reply".
+
+4) Para acceder a los datos del Concierge desde otros agentes:
+     {{ $('Concierge Agent').item.json.output.data.email }}
+     {{ $('Concierge Agent').item.json.output.data.message }}
+     {{ $('Concierge Agent').item.json.output.data.customer_id }}
+
+================================================================

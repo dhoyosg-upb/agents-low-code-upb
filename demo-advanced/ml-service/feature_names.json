@@ -1,0 +1,19 @@
+[
+  "tenure_months",
+  "monthly_charge_usd",
+  "total_charges_usd",
+  "num_complaints_90d",
+  "late_payments_12m",
+  "support_calls_30d",
+  "avg_data_usage_gb",
+  "num_services",
+  "discount_pct_active",
+  "contract_month_to_month",
+  "contract_one_year",
+  "contract_two_year",
+  "payment_electronic_check",
+  "payment_credit_card",
+  "payment_bank_transfer",
+  "payment_cash",
+  "has_competitor_offer"
+]

@@ -1,0 +1,754 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {
+          "responseMode": "responseNodes"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "f5e66259-418d-45fe-833b-1459092e1544",
+      "name": "When chat message received",
+      "webhookId": "869f602d-b254-4075-a73b-d2d1a40c6d89",
+      "notesInFlow": false,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        224,
+        208
+      ],
+      "id": "653d6e28-623d-4386-b7c2-4125a37a6ff0",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "endpointUrl": "https://dhoyosg-churn-mcp-demo.hf.space/mcp/",
+        "include": "selected",
+        "includeTools": [
+          "lookup_customer"
+        ],
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "typeVersion": 1.2,
+      "position": [
+        368,
+        224
+      ],
+      "id": "4eebc0a4-1567-4376-954a-a9880e4f4392",
+      "name": "MCP Client"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "db221e09-7e37-4b7f-ab76-f90459b4d689",
+              "leftValue": "={{ $json.output.ready }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "b000fc6a-2558-4389-862d-1923334de2a8",
+              "leftValue": "",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        880,
+        0
+      ],
+      "id": "17e64cb3-8f7c-4c12-8d77-dadf94299139",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "model": "qwen/qwen3-32b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        1232,
+        -128
+      ],
+      "id": "0398d4ce-909c-46d8-8412-97ae11e584ec",
+      "name": "Groq Chat Model1",
+      "credentials": {
+        "groqApi": {
+          "id": "gBmwsa1fPRlstoxz",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "endpointUrl": "https://dhoyosg-churn-mcp-demo.hf.space/mcp/",
+        "include": "selected",
+        "includeTools": [
+          "get_payment_history"
+        ],
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "typeVersion": 1.2,
+      "position": [
+        1360,
+        -160
+      ],
+      "id": "cf3fe496-d9b1-4429-afb9-0a1ae4d31e8c",
+      "name": "MCP Client2"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-120b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        1264,
+        224
+      ],
+      "id": "7f2f461e-420d-4683-bc19-ba138b82e074",
+      "name": "Groq Chat Model2",
+      "credentials": {
+        "groqApi": {
+          "id": "gBmwsa1fPRlstoxz",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "endpointUrl": "https://dhoyosg-churn-mcp-demo.hf.space/mcp/",
+        "include": "selected",
+        "includeTools": [
+          "predict_churn_risk"
+        ],
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "typeVersion": 1.2,
+      "position": [
+        1376,
+        224
+      ],
+      "id": "4af27ae6-7d69-4393-b705-a0f4eba501d1",
+      "name": "MCP Client1"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-120b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        1264,
+        576
+      ],
+      "id": "ec2c58d1-c196-4148-9650-1264a41006bb",
+      "name": "Groq Chat Model3",
+      "credentials": {
+        "groqApi": {
+          "id": "gBmwsa1fPRlstoxz",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "endpointUrl": "https://dhoyosg-churn-mcp-demo.hf.space/mcp/",
+        "include": "selected",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "typeVersion": 1.2,
+      "position": [
+        1424,
+        608
+      ],
+      "id": "c7d53511-563b-4dad-87ef-70003524ff7b",
+      "name": "MCP Client3"
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1712,
+        -176
+      ],
+      "id": "36a2ac41-71d8-4a10-8a88-9e4ea90bf07c",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Eres el supervisor de retencion de TelcoX. Recibes el mensaje original del\ncliente y 3 reportes JSON (comercial/pagos, riesgo/churn, cx). Decides UNA\naccion y redactas el mensaje que el cliente vera en el chat.\n\n=========================================================\nPOLITICAS DE NEGOCIO (estricto, primer match gana, en orden):\n=========================================================\n\nP1. Si payer_class == \"delinquent\" OR in_collections == true:\n      action = \"offer_payment_plan\"\n      - Prohibido descuentos/upgrades antes de regularizar deuda.\n      - Si real_reason == \"financial_hardship\":\n          tono empatico; plan de 3 cuotas sin interes + congelar servicio al minimo.\n      - Si NO hay financial_hardship:\n          recordar deuda con calma + plan de 2 cuotas para ponerse al dia.\n\nP2. Si urgency >= 0.8 AND sentiment == \"negative\" AND payer_class != \"delinquent\":\n      action = \"escalate_human\"\n      - No negociar; promete que un asesor humano lo llamara en menos de 1h.\n\nP3. Si churn_probability >= 0.65 AND payer_class in [\"premium\",\"regular\"]:\n      action = \"retain_aggressive\"\n      - real_reason competitor       -> match de oferta (20-25% off)\n                                        + 1 beneficio diferencial.\n      - real_reason service_quality\n        AND recurring_issue == true  -> 15% off por 3 meses + escalamiento tecnico.\n      - real_reason price            -> 15-20% off por 6 meses con permanencia 12m.\n      - Otros high risk              -> 15% off + revision del plan.\n\nP4. Si churn_probability >= 0.65 AND payer_class == \"risky\":\n      action = \"let_go\"\n      - Cierre amable, sin descuentos. Confirma cancelacion y agradece.\n\nP5. Si real_reason == \"no_use\":\n      action = \"retain_soft\"\n      - Ofrece pausa del servicio hasta 3 meses sin perder numero/cuenta.\n\nP6. Resto:\n      action = \"retain_soft\"\n      - Agradece lealtad, ofrece beneficio NO monetario.\n\n=========================================================\nREGLAS DE REDACCION DEL MENSAJE AL CLIENTE (campo reply):\n=========================================================\n  - Idioma: espanol neutro, tuteo.\n  - Longitud: 60 a 120 palabras.\n  - Empieza llamando al cliente por su NOMBRE.\n  - Reconoce su situacion en 1 frase (empatia).\n  - Presenta la propuesta en bullets o **negrita**.\n  - Maximo 2 emojis discretos.\n  - Termina con UNA pregunta o CTA claro.\n  - PROHIBIDO: \"como modelo de lenguaje\", disculpas excesivas, jerga interna,\n    mencionar churn / probabilidades / scores.\n  - SIEMPRE alinear el medio sugerido al preferred_channel del CX.\n\n=========================================================\nFORMATO DE SALIDA (OBLIGATORIO):\n=========================================================\n  {\n    \"reply\": \"<MENSAJE COMPLETO PARA EL CLIENTE>\",\n    \"data\": {\n      \"action\":        \"retain_aggressive\" | \"retain_soft\" | \"let_go\" | \"escalate_human\" | \"offer_payment_plan\",\n      \"offer_text\":    \"<descripcion corta de la oferta interna>\",\n      \"justification\": \"<por que se eligio esta accion segun las politicas>\",\n      \"confidence\":    <number entre 0 y 1>\n    }\n  }\n\nNOTA CRITICA:\n  El campo \"reply\" es lo que el ultimo Set node llevara al chat del usuario.\n  NO pongas JSON ni metadatos en \"reply\", SOLO texto natural.\n  Los datos tecnicos van en \"data\".\n\n=========================================================\nEJEMPLO DE PRUEBA (Pedro Moroso, action=offer_payment_plan):\n=========================================================\n{\n  \"reply\": \"Hola Pedro, lamento mucho lo que estas pasando. Sabemos que internet hoy es trabajo y comunicacion, asi que te quiero ayudar:\\n- **Plan de 3 cuotas sin interes** para los $105 pendientes.\\n- Mantenemos tu servicio activo en plan basico mientras te pones al dia.\\n- Te llamamos por WhatsApp, que es como prefieres que te contactemos.\\nTe parece si activamos el plan ahora mismo?\",\n  \"data\": {\n    \"action\":        \"offer_payment_plan\",\n    \"offer_text\":    \"Plan de pago en 3 cuotas sin interes para deuda de $105.\",\n    \"justification\": \"Cliente delinquent ($105 en cobranza), real_reason financial_hardship; politica P1 con tono empatico.\",\n    \"confidence\":    0.9\n  }\n}\nDATA REAL DEL CLIENTE: (CONTESTAR CON BASE A ESTA DATA)\nCUSTOMER DATA: {{ $json.output.reply }}\nCUSTOMER INFO: {{ $json.output.data.toJsonString() }}\n\nCustomer Name: {{ $('Agente Orquestador').item.json.output.data.name }}",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1904,
+        -176
+      ],
+      "id": "7dd5890c-20e6-4c5d-9e0b-c0d3484d62f9",
+      "name": "Strategist"
+    },
+    {
+      "parameters": {
+        "message": "={{ $json.output.reply }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1.3,
+      "position": [
+        2304,
+        -160
+      ],
+      "id": "e74275b2-6a04-44ee-ae5c-73ac7e83d676",
+      "name": "Chat",
+      "webhookId": "49616e36-aefe-4563-983b-9927a05de91b",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"ready\": { \"type\": \"boolean\" },\n    \"reply\": { \"type\": \"string\" },\n    \"data\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"customer_id\": { \"type\": [\"integer\", \"null\"] },\n        \"email\":       { \"type\": [\"string\", \"null\"] },\n        \"name\":        { \"type\": [\"string\", \"null\"] },\n        \"message\":     { \"type\": [\"string\", \"null\"] }\n      },\n      \"required\": [\"customer_id\", \"email\", \"name\", \"message\"]\n    }\n  },\n  \"required\": [\"ready\", \"reply\", \"data\"]\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        512,
+        192
+      ],
+      "id": "43b6fbd2-5288-4293-b254-bef492e3ad5b",
+      "name": "Structured Output Parser",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Eres analista senior de retencion. Tu unica fuente de verdad es el modelo de\nMachine Learning expuesto via MCP. NO opines sobre el cliente sin haber\nllamado a la tool.\n\nUSO DE LA HERRAMIENTA:\n  1. Llama UNA VEZ a predict_churn_risk(email).\n  2. Si la tool falla:\n       reply = \"No pude obtener la prediccion del modelo.\"\n       data  = { \"risk_level\": \"unknown\", \"churn_probability\": null, \"top_drivers_business\": [] }\n\nDICCIONARIO DE TRADUCCION (top_drivers tecnico -> negocio):\n  - tenure_months bajo              -> \"Cliente nuevo, todavia no ha generado lealtad\"\n  - has_competitor_offer == 1       -> \"Tiene oferta activa de la competencia\"\n  - contract_type == month_to_month -> \"Plan sin permanencia, puede irse cualquier mes\"\n  - late_payments_12m alto          -> \"Historial de atrasos en pagos\"\n  - num_complaints_90d alto         -> \"Multiples quejas recientes en soporte\"\n  - support_calls_30d alto          -> \"Frecuente contacto con soporte (frustracion)\"\n  - avg_data_usage_gb bajo          -> \"Bajo uso del servicio (no le saca valor)\"\n  - num_services bajo               -> \"Solo tiene un producto contratado, facil de migrar\"\n\nELIGE LOS TOP 3 DRIVERS mas relevantes (los del modelo, no los que tu imaginas).\n\nreply (1 frase) combina el score y tu lectura, ej:\n  \"Riesgo alto (0.71) impulsado principalmente por mora actual y plan basico\n   sin permanencia.\"\n\nFORMATO DE SALIDA (OBLIGATORIO):\n  {\n    \"reply\": \"<resumen 1 frase con probabilidad y drivers principales>\",\n    \"data\": {\n      \"customer_id\":          <int>,\n      \"churn_probability\":    <number o null>,\n      \"risk_level\":           \"low\" | \"medium\" | \"high\" | \"unknown\",\n      \"top_drivers_business\": [\"<frase 1>\", \"<frase 2>\", \"<frase 3>\"]\n    }\n  }\n\nEJEMPLOS:\n  - reply=\"Riesgo alto (0.93) por mora prolongada, multiples quejas y plan sin permanencia.\",\n    data.risk_level=\"high\", data.churn_probability=0.93,\n    data.top_drivers_business=[\"Historial de atrasos en pagos\",\"Multiples quejas recientes en soporte\",\"Plan sin permanencia, puede irse cualquier mes\"].\n\n  - reply=\"Riesgo bajo (0.17): cliente premium con 4 anos de tenure y multiples servicios.\",\n    data.risk_level=\"low\", data.churn_probability=0.17.\n\nCustomer Email: {{ $json.output.data.email }}\n\nOrchestator Agent: {{ $('Agente Orquestador').item.json.output.reply }}",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1296,
+        0
+      ],
+      "id": "e57fa0c6-9d3c-42ab-8a76-acbe23e41736",
+      "name": "Agente Churn Expert",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Eres analista de experiencia del cliente (CX). Combinas datos crudos de soporte\ncon el mensaje que el cliente acaba de enviar por chat.\nCUSTOMER EMAIL: {{ $json.output.data.email }}\n\nUSO DE LA HERRAMIENTA:\n  1. Llama UNA VEZ a get_support_history(email).\n  2. Recibes datos CRUDOS (sin scores): canal preferido, # quejas 90d,\n     llamadas 30d, texto de la ultima queja, uso promedio de datos.\n  3. Si la tool falla:\n       reply = \"No pude obtener el historial de soporte.\"\n       data.real_reason = \"unknown\".\n\nTU INTERPRETAS EL MENSAJE DEL USUARIO Y DECIDES:\n\n  sentiment   = \"negative\" si hay enojo, frustracion, palabras agresivas.\n                \"neutral\"  si es informativo / frio.\n                \"positive\" si esta abierto a solucion.\n\n  urgency     = 0.0 a 1.0\n                +0.4 si dice \"YA\", \"ahora\", \"hoy\", mayusculas sostenidas.\n                +0.3 si menciona competidor con oferta concreta.\n                +0.2 si dice \"ultima oportunidad\" / \"si no, me voy\".\n\n  real_reason = elige el mas probable segun el mensaje:\n                price              -> menciona costo / mas barato / caro\n                service_quality    -> lentitud, intermitencia, calidad mala\n                competitor         -> menciona explicitamente otro proveedor\n                life_event         -> mudanza, viaje, separacion\n                no_use             -> \"no lo uso\", \"no lo necesito\"\n                financial_hardship -> \"perdi el trabajo\", \"no tengo plata\"\n                unknown            -> si no hay senal clara\n\n  recurring_issue = true si el motivo del chat coincide tematicamente con\n                    last_complaint_text del historial; false en otro caso.\n\n  key_phrase  = la frase TEXTUAL del cliente que mejor resume el problema.\n\nreply (1-2 frases) describe el estado emocional + canal:\n  \"Cliente enojado (urgencia 0.9), motivo principal competitor.\n   Contactar por <preferred_channel>.\"\n\nFORMATO DE SALIDA (OBLIGATORIO):\n  {\n    \"reply\": \"<resumen 1-2 frases>\",\n    \"data\": {\n      \"customer_id\":       <int>,\n      \"preferred_channel\": \"<string>\",\n      \"sentiment\":         \"negative\" | \"neutral\" | \"positive\",\n      \"urgency\":           <number entre 0 y 1>,\n      \"real_reason\":       \"price\" | \"service_quality\" | \"competitor\" | \"life_event\" | \"no_use\" | \"financial_hardship\" | \"unknown\",\n      \"recurring_issue\":   <boolean>,\n      \"key_phrase\":        \"<frase literal>\"\n    }\n  }\n\n\n\n",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1312,
+        400
+      ],
+      "id": "3e0c068f-07c1-4b7c-938c-99dc7c0448c9",
+      "name": "Agente CX1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Eres analista comercial senior en TelcoX. Te enfocas SOLO en plata: plan,\nfacturacion, deuda, comportamiento de pago.\n\nUSO DE LA HERRAMIENTA:\n  1. Llama UNA SOLA VEZ a get_payment_history(email) con el email recibido.\n  2. NO inventes nada. Si la tool falla:\n       reply = \"No pude consultar el historial de pagos.\"\n       data  = { \"payer_class\": \"unknown\" }\n\nCRITERIOS DE CLASIFICACION (en este orden, primer match gana):\n  - delinquent : in_collections == true OR current_debt_usd > monthly_charge*2\n                 OR late_payments_12m >= 5\n  - risky      : 3 <= late_payments_12m <= 4 OR (current_debt_usd > 0 AND no es delinquent)\n  - regular    : late_payments_12m <= 2 AND current_debt_usd == 0\n                 AND plan_type in [basic, standard]\n  - premium    : late_payments_12m == 0 AND current_debt_usd == 0\n                 AND plan_type in [premium, enterprise]\n\nreply (1 frase, max 30 palabras) sigue este patron:\n  \"Cliente <plan_type> de $<monthly>/mes, <on_time_pct*100>% pagos a tiempo,\n   deuda actual $<current_debt>; clasificacion: <payer_class>.\"\n\nFORMATO DE SALIDA (OBLIGATORIO):\n  {\n    \"reply\": \"<resumen 1 frase>\",\n    \"data\": {\n      \"customer_id\":       <int>,\n      \"plan_type\":         \"<string>\",\n      \"payer_class\":       \"premium\" | \"regular\" | \"risky\" | \"delinquent\" | \"unknown\",\n      \"current_debt_usd\":  <number>,\n      \"in_collections\":    <boolean>,\n      \"late_payments_12m\": <int>,\n      \"on_time_pct\":       <number>,\n      \"avg_ticket_usd\":    <number>,\n      \"payment_method\":    \"<string>\"\n    }\n  }\n\nEJEMPLOS:\n  - reply=\"Cliente basic de $35/mes, 67% pagos a tiempo, deuda $105 en cobranza; clasificacion: delinquent.\",\n    data.payer_class=\"delinquent\", data.in_collections=true, data.current_debt_usd=105.\n\n  - reply=\"Cliente premium de $89/mes, 100% pagos a tiempo, sin deuda; clasificacion: premium.\",\n    data.payer_class=\"premium\", data.in_collections=false, data.current_debt_usd=0.\nUSERMAIL: {{ $json.output.data.email }}\nUSERMESSAGE: {{ $json.output.data.message }}\nOrchestator Agent Message: {{ $('Agente Orquestador').item.json.output.reply }}",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1280,
+        -336
+      ],
+      "id": "db7181cf-ec74-4ee7-a442-36687647e5c0",
+      "name": "Agente Comercial"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Eres el asistente virtual de retencion de TelcoX, una telco colombiana.\nHablas espanol neutro, calido y conciso (maximo 3 frases por turno).\n\nTu unico objetivo es recolectar dos datos antes de pasar el caso al equipo:\n  1. EMAIL del cliente (validado contra la base via lookup_customer).\n  2. RAZON por la que escribio (en sus propias palabras, minimo 5 palabras).\n\nFLUJO ESTRICTO:\n  Turno 1: saluda y pregunta en que puedes ayudar.\n           ready = false\n  Turno 2 (si menciona cancelar / problema / queja / dar de baja):\n           pide su correo electronico explicando que es para validarlo.\n           ready = false\n  Turno 3 (cuando recibas algo que parezca email):\n           - Llama la tool lookup_customer(email).\n           - Si la tool devuelve error o not found:\n               ready = false\n               reply = \"No encuentro esa cuenta, podrias verificar el correo?\"\n           - Si la tool devuelve un cliente:\n               ready = false\n               reply = \"Gracias <name>. Me cuentas brevemente que esta pasando?\"\n               data.customer_id, data.email, data.name = lo que devolvio la tool.\n  Turno 4: cuando recibas la razon del cliente:\n           ready = true\n           reply = \"Gracias <name>, dame un momento mientras reviso tu caso.\"\n           data.message = texto literal del usuario.\n\nREGLAS DURAS:\n  - ready solo es true cuando YA TIENES email validado + razon. Punto.\n  - Nunca pidas cedula, tarjeta, contrasena ni datos sensibles.\n  - Nunca inventes customer_id ni name: solo lo que devuelva la tool.\n  - Si el usuario divaga, redirigelo amable pero firme.\n  - Nunca prometas descuentos ni soluciones.\n\nFORMATO DE SALIDA (OBLIGATORIO):\n{\n  \"ready\": true | false,\n  \"reply\": \"texto que vera el usuario\",\n  \"data\": {\n    \"customer_id\": <int o null>,\n    \"email\":       \"<string o null>\",\n    \"name\":        \"<string o null>\",\n    \"message\":     \"<string o null>\"\n  }\n}\n\nEJEMPLOS:\n\n  Usuario: \"hola\"\n  -> {\n       \"ready\": false,\n       \"reply\": \"Hola! Soy el asistente de TelcoX. En que te puedo ayudar?\",\n       \"data\":  { \"customer_id\": null, \"email\": null, \"name\": null, \"message\": null }\n     }\n\n  Usuario: \"quiero cancelar\"\n  -> {\n       \"ready\": false,\n       \"reply\": \"Lamento escuchar eso. Para revisar tu caso, me regalas tu correo registrado?\",\n       \"data\":  { \"customer_id\": null, \"email\": null, \"name\": null, \"message\": null }\n     }\n\n  Usuario: \"daniel.hoyosg@upb.edu.co\"  (lookup devuelve Daniel Hoyos Gonzalez, id 5001)\n  -> {\n       \"ready\": false,\n       \"reply\": \"Gracias Daniel. Me cuentas brevemente que esta pasando?\",\n       \"data\":  {\n         \"customer_id\": 5001,\n         \"email\":       \"daniel.hoyosg@upb.edu.co\",\n         \"name\":        \"Daniel Hoyos Gonzalez\",\n         \"message\":     null\n       }\n     }\n\n  Usuario: \"el internet va lento y la competencia me ofrece 30% menos\"\n  -> {\n       \"ready\": true,\n       \"reply\": \"Gracias Daniel, dame un momento mientras reviso tu caso.\",\n       \"data\":  {\n         \"customer_id\": 5001,\n         \"email\":       \"daniel.hoyosg@upb.edu.co\",\n         \"name\":        \"Daniel Hoyos Gonzalez\",\n         \"message\":     \"el internet va lento y la competencia me ofrece 30% menos\"\n       }\n     }\nINPUT DE USUARIO: \n{{ $json.chatInput }}",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        240,
+        -16
+      ],
+      "id": "0b8c8855-4f82-476f-ab56-6334cda6a3db",
+      "name": "Agente Orquestador",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "message": "={{ $json.output.reply}}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1.3,
+      "position": [
+        944,
+        320
+      ],
+      "id": "6ae2f574-b5ea-4886-95c7-5db248472364",
+      "name": "Chat1",
+      "webhookId": "49616e36-aefe-4563-983b-9927a05de91b"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"reply\": { \"type\": \"string\" },\n    \"data\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"customer_id\":       { \"type\": [\"integer\", \"null\"] },\n        \"plan_type\":         { \"type\": [\"string\", \"null\"] },\n        \"payer_class\":       { \"type\": \"string\", \"enum\": [\"premium\", \"regular\", \"risky\", \"delinquent\", \"unknown\"] },\n        \"current_debt_usd\":  { \"type\": [\"number\", \"null\"] },\n        \"in_collections\":    { \"type\": [\"boolean\", \"null\"] },\n        \"late_payments_12m\": { \"type\": [\"integer\", \"null\"] },\n        \"on_time_pct\":       { \"type\": [\"number\", \"null\"] },\n        \"avg_ticket_usd\":    { \"type\": [\"number\", \"null\"] },\n        \"payment_method\":    { \"type\": [\"string\", \"null\"] }\n      },\n      \"required\": [\"payer_class\"]\n    }\n  },\n  \"required\": [\"reply\", \"data\"]\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        1504,
+        -144
+      ],
+      "id": "3b96f4af-d6f7-4e7e-8981-acfc00e46a04",
+      "name": "Structured Output Parser1",
+      "retryOnFail": false,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"reply\": { \"type\": \"string\" },\n    \"data\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"customer_id\":          { \"type\": [\"integer\", \"null\"] },\n        \"churn_probability\":    { \"type\": [\"number\", \"null\"] },\n        \"risk_level\":           { \"type\": \"string\", \"enum\": [\"low\", \"medium\", \"high\", \"unknown\"] },\n        \"top_drivers_business\": {\n          \"type\": \"array\",\n          \"items\": { \"type\": \"string\" }\n        }\n      },\n      \"required\": [\"risk_level\", \"top_drivers_business\"]\n    }\n  },\n  \"required\": [\"reply\", \"data\"]\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        1504,
+        192
+      ],
+      "id": "3f130af4-366e-4a09-85c2-590a3463d432",
+      "name": "Structured Output Parser2"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"reply\": { \"type\": \"string\" },\n    \"data\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"customer_id\":       { \"type\": [\"integer\", \"null\"] },\n        \"preferred_channel\": { \"type\": [\"string\", \"null\"] },\n        \"sentiment\":         { \"type\": \"string\", \"enum\": [\"negative\", \"neutral\", \"positive\"] },\n        \"urgency\":           { \"type\": \"number\", \"minimum\": 0, \"maximum\": 1 },\n        \"real_reason\":       { \"type\": \"string\", \"enum\": [\"price\", \"service_quality\", \"competitor\", \"life_event\", \"no_use\", \"financial_hardship\", \"unknown\"] },\n        \"recurring_issue\":   { \"type\": \"boolean\" },\n        \"key_phrase\":        { \"type\": [\"string\", \"null\"] }\n      },\n      \"required\": [\"sentiment\", \"urgency\", \"real_reason\", \"recurring_issue\"]\n    }\n  },\n  \"required\": [\"reply\", \"data\"]\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        1568,
+        608
+      ],
+      "id": "ac580e40-f9bb-4f33-be03-62f4f06d1b71",
+      "name": "Structured Output Parser3"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"reply\": { \"type\": \"string\" },\n    \"data\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"action\":        { \"type\": \"string\", \"enum\": [\"retain_aggressive\", \"retain_soft\", \"let_go\", \"escalate_human\", \"offer_payment_plan\"] },\n        \"offer_text\":    { \"type\": \"string\" },\n        \"justification\": { \"type\": \"string\" },\n        \"confidence\":    { \"type\": \"number\", \"minimum\": 0, \"maximum\": 1 }\n      },\n      \"required\": [\"action\", \"offer_text\", \"justification\", \"confidence\"]\n    }\n  },\n  \"required\": [\"reply\", \"data\"]\n}\n\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        2080,
+        32
+      ],
+      "id": "8b662ee6-a84f-4399-9d99-dbca09751580",
+      "name": "Structured Output Parser4"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-120b:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        352
+      ],
+      "id": "a036db36-fb79-4dd3-84f4-b5d786823678",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "pIe25Nh68nzQwoz3",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-120b:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        1840,
+        16
+      ],
+      "id": "4476d08c-e76b-4a21-b88f-68aa4042f64b",
+      "name": "OpenRouter Chat Model1",
+      "credentials": {
+        "openRouterApi": {
+          "id": "pIe25Nh68nzQwoz3",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "message": "={{ $json.output.reply}}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1.3,
+      "position": [
+        1040,
+        -432
+      ],
+      "id": "6536ba65-36f9-454c-8dcd-bae0926aa924",
+      "name": "Chat2",
+      "webhookId": "49616e36-aefe-4563-983b-9927a05de91b"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Agente Orquestador",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Agente Orquestador",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MCP Client": {
+      "ai_tool": [
+        [
+          {
+            "node": "Agente Orquestador",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Agente Churn Expert",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Agente Comercial",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Agente CX1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Chat2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Chat1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agente Comercial",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MCP Client2": {
+      "ai_tool": [
+        [
+          {
+            "node": "Agente Comercial",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agente Churn Expert",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MCP Client1": {
+      "ai_tool": [
+        [
+          {
+            "node": "Agente Churn Expert",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agente CX1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MCP Client3": {
+      "ai_tool": [
+        [
+          {
+            "node": "Agente CX1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Strategist",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Strategist": {
+      "main": [
+        [
+          {
+            "node": "Chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Agente Orquestador",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agente Churn Expert": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Agente CX1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Agente Comercial": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agente Orquestador": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Agente Comercial",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser2": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Agente Churn Expert",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser3": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Agente CX1",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser4": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Strategist",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agente Orquestador",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Strategist",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "63459f6b-fb21-498d-adf4-2cffa9b86ec7",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3be8512750c65f9c87657c22794fd34acd883e3f4f7113f9d22c6e438a863d99"
+  },
+  "id": "eXhxuoCM3IZi05bz",
+  "tags": []
+}
